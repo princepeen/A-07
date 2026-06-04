@@ -1,1 +1,210 @@
+/* ============================================================
+   ANIMATIONS.CSS — All @keyframes & transition classes
+   Birthday PWA for Ashu
+   ============================================================ */
+
+/* ── Entrance animations ── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes riseDeep {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes veilFadeIn {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Utility entrance classes ── */
+.anim-rise       { opacity: 0; animation: rise    var(--dur, 1.6s) var(--ease-out) var(--delay, 0s) forwards; }
+.anim-riseDeep   { opacity: 0; animation: riseDeep var(--dur, 1.8s) var(--ease-out) var(--delay, 0s) forwards; }
+.anim-fadein     { opacity: 0; animation: fadein  var(--dur, 1.4s) ease            var(--delay, 0s) forwards; }
+.anim-scalein    { opacity: 0; animation: scaleIn var(--dur, 0.6s) var(--ease-out) var(--delay, 0s) forwards; }
+
+/* ── Starburst ── */
+/* Canvas-drawn, but these classes drive the overlay */
+@keyframes burstIn {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes burstPulse {
+  0%, 100% { transform: scale(1);    opacity: 0.8; }
+  50%       { transform: scale(1.06); opacity: 1; }
+}
+
+.burst-active {
+  animation: burstIn 1.6s var(--ease-soft) forwards;
+}
+
+/* ── Shooting star trail (CSS fallback for non-canvas pages) ── */
+@keyframes shootLeft {
+  0%   { transform: translateX(0)   translateY(0)   scaleX(0); opacity: 0; }
+  10%  { opacity: 1; scaleX(1); }
+  90%  { opacity: 0.7; }
+  100% { transform: translateX(220px) translateY(80px) scaleX(1); opacity: 0; }
+}
+
+/* ── Cloud button fog particles ── */
+@keyframes fogDrift {
+  0%   { transform: translateX(0)   translateY(0)   scale(1);    opacity: 0; }
+  20%  { opacity: var(--fog-op, 0.35); }
+  80%  { opacity: var(--fog-op, 0.18); }
+  100% { transform: translateX(var(--fx, 30px)) translateY(var(--fy, -12px)) scale(1.6); opacity: 0; }
+}
+
+@keyframes fogPulse {
+  0%, 100% { opacity: 0.03; transform: scale(1)    translateX(0); }
+  50%       { opacity: 0.07; transform: scale(1.08) translateX(4px); }
+}
+
+/* ── Cloud button hover glow ── */
+@keyframes cloudGlow {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* ── Password slots ── */
+@keyframes slotPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slotShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+@keyframes slotSuccess {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(184,208,176,0.5); }
+  50%  { transform: scale(1.12); box-shadow: 0 0 0 8px rgba(184,208,176,0); }
+  100% { transform: scale(1); }
+}
+
+/* ── Counter digits ── */
+@keyframes digitFlip {
+  0%   { transform: translateY(-6px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Envelope open ── */
+@keyframes envelopeLift {
+  0%   { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-8px) rotate(-1.5deg); }
+}
+
+@keyframes flapOpen {
+  0%   { transform: rotateX(0deg); }
+  100% { transform: rotateX(-180deg); }
+}
+
+@keyframes letterReveal {
+  0%   { opacity: 0; transform: translateY(20px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── Music player ── */
+@keyframes albumSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes progressPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232,180,192,0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(232,180,192,0); }
+}
+
+/* ── Timeline ── */
+@keyframes timelineDot {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes lineGrow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* ── Surprise page ── */
+@keyframes starFloat {
+  0%, 100% { transform: translateY(0)   rotate(0deg);   opacity: 0.6; }
+  50%       { transform: translateY(-14px) rotate(180deg); opacity: 1; }
+}
+
+@keyframes whiteFlower {
+  0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+  60%  { transform: scale(1.1) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+}
+
+/* ── Popup ── */
+@keyframes popupIn {
+  0%   { opacity: 0; transform: scale(0.9) translateY(10px); }
+  100% { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+@keyframes popupOut {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95) translateY(6px); }
+}
+
+/* ── Ambient cloud drift ── */
+@keyframes cloudDriftL {
+  0%   { transform: translateX(-15vw); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(115vw); opacity: 0; }
+}
+
+@keyframes cloudDriftR {
+  0%   { transform: translateX(115vw); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(-15vw); opacity: 0; }
+}
+
+/* ── Fog layer ── */
+@keyframes fogLayerShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Twinkling ── */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.9); }
+  50%       { opacity: 0.8;  transform: scale(1.1); }
+}
+
+/* ── Glow pulse ── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(240,192,208,0.2); }
+  50%       { box-shadow: 0 0 28px rgba(240,192,208,0.5); }
+}
+
+@keyframes glowPulseSoft {
+  0%, 100% { text-shadow: 0 0 20px rgba(240,192,208,0.1); }
+  50%       { text-shadow: 0 0 40px rgba(240,192,208,0.35); }
+            }
 
