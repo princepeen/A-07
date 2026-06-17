@@ -1,10 +1,75 @@
 /* ============================================================
    APP.JS — Shared app logic
-   Page transitions, veil, starburst, cloud buttons, fog
+   Page transitions, veil, starburst, cloud buttons, fog,
+   background music (persists across pages, off on music.html)
    ============================================================ */
 
 (function() {
   'use strict';
+
+  /* ══════════════════════════════════════════════
+     0. BACKGROUND MUSIC
+     Plays audio/background.mp3 on every page except
+     music.html. Position + play/pause state persists
+     across page navigations via sessionStorage.
+  ══════════════════════════════════════════════ */
+  (function initBackgroundMusic() {
+    const isMusicPage = /music\.html$/i.test(window.location.pathname);
+    if (isMusicPage) return; // music.html has its own player; no background track here
+
+    const bg = new Audio('audio/background.mp3');
+    bg.loop = true;
+    bg.volume = 0.35;
+    window.bgMusic = bg;
+
+    const STORAGE_KEY = 'ashu_bg_music';
+
+    function readState() {
+      try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}'); }
+      catch (e) { return {}; }
+    }
+    function writeState(state) {
+      try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    const saved = readState();
+
+    function tryResume() {
+      if (saved.playing === false) return; // user explicitly paused before
+      if (typeof saved.time === 'number' && isFinite(saved.time)) {
+        bg.currentTime = saved.time;
+      }
+      bg.play().catch(() => {
+        // Autoplay blocked — resume on first user interaction
+        const resume = () => {
+          bg.play().catch(() => {});
+          document.removeEventListener('click', resume);
+          document.removeEventListener('touchstart', resume);
+        };
+        document.addEventListener('click', resume, { once: true });
+        document.addEventListener('touchstart', resume, { once: true });
+      });
+    }
+
+    if (bg.readyState >= 2) tryResume();
+    else bg.addEventListener('canplaythrough', tryResume, { once: true });
+
+    // Persist position regularly and on navigation away
+    setInterval(() => {
+      writeState({ time: bg.currentTime, playing: !bg.paused });
+    }, 1000);
+
+    window.addEventListener('beforeunload', () => {
+      writeState({ time: bg.currentTime, playing: !bg.paused });
+    });
+
+    // Expose simple controls for an optional mute button on any page
+    window.toggleBgMusic = function() {
+      if (bg.paused) { bg.play().catch(()=>{}); writeState({ time: bg.currentTime, playing: true }); }
+      else           { bg.pause();              writeState({ time: bg.currentTime, playing: false }); }
+      return !bg.paused;
+    };
+  })();
 
   /* ══════════════════════════════════════════════
      1. PAGE TRANSITION (veil fade)
@@ -410,4 +475,4 @@
   });
 
 })();
-    
+         
