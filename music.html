@@ -4,134 +4,93 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Music — Ashu</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#f2f0ed"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
   <style>
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    /* ── music.html overrides: light warm-white/grey theme ── */
+    html, body {
+      overflow: hidden;
+      background: #f2f0ed;
+    }
 
     :root {
-      --bg:         #f2f0ed;
-      --surface:    rgba(200,196,192,0.18);
-      --border:     rgba(180,175,170,0.25);
-      --text:       #2a2724;
-      --text-dim:   #9a9390;
-      --text-mid:   #7a7370;
-      --pink:       #e8b4c0;
-      --pink-soft:  #f0ccd6;
-      --pink-dim:   rgba(232,180,192,0.25);
-      --lavender:   #9890a8;
-      --line:       rgba(160,155,150,0.18);
-      --font-serif: 'Cormorant Garamond', Georgia, serif;
-      --font-sans:  'Jost', sans-serif;
-      --ease-out:   cubic-bezier(0.22,1,0.36,1);
-      --player-h:   88px;
+      --music-bg:        #f2f0ed;
+      --music-surface:   rgba(200,196,192,0.18);
+      --music-border:    rgba(180,175,170,0.25);
+      --music-text:      #2a2724;
+      --music-text-dim:  #9a9390;
+      --music-text-mid:  #7a7370;
+      --music-pink:      #d88da3;
+      --music-pink-soft: #c97389;
+      --music-line:      rgba(160,155,150,0.18);
+      --player-h:        88px;
     }
 
-    html, body {
-      width:100%; height:100%;
-      background: var(--bg);
-      font-family: var(--font-sans);
-      -webkit-font-smoothing: antialiased;
-      overflow: hidden;
-    }
+    body { background: var(--music-bg); }
 
-    /* ── Canvas ── */
-    #sky { position:fixed; inset:0; z-index:0; pointer-events:none; }
-
-    /* ── Ambient ── */
-    .amb {
-      position:fixed; inset:0; z-index:1; pointer-events:none;
+    /* override shared ambient layer for light theme */
+    .ambient-base {
       background:
-        radial-gradient(ellipse 80% 50% at 50% 0%,   rgba(232,180,192,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 30% at 100% 60%,  rgba(184,176,200,0.09)  0%, transparent 50%),
-        radial-gradient(ellipse 60% 35% at 0%   70%,  rgba(200,190,180,0.07) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 50% at 50% 0%,  rgba(216,141,163,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 30% at 100% 60%, rgba(184,176,200,0.09) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 35% at 0% 70%,   rgba(200,190,180,0.07) 0%, transparent 50%);
     }
 
     /* ── Page ── */
     .page {
-      position: fixed; inset:0; z-index:10;
-      display: flex;
-      flex-direction: column;
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
       overflow: hidden;
     }
 
     /* ── Header ── */
-    .header {
+    .m-header {
       flex-shrink: 0;
       padding: 3.2rem 1.6rem 0;
       opacity: 0;
       animation: rise 1.6s var(--ease-out) 0.3s forwards;
     }
 
-    .header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-
     .back-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      color: var(--text-dim);
-      font-size: 0.54rem;
-      font-weight: 200;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
+      display: flex; align-items:center; gap:0.5rem;
+      background:none; border:none; cursor:pointer;
+      color: var(--music-text-dim);
+      font-size: 0.54rem; font-weight:200; letter-spacing:0.35em; text-transform:uppercase;
+      margin-bottom: 0.5rem;
       transition: color 0.3s ease;
     }
-    .back-btn:hover { color: var(--text); }
-    .back-arrow {
-      width: 7px; height: 7px;
-      border-left: 1px solid currentColor;
-      border-top: 1px solid currentColor;
-      transform: rotate(-45deg);
-    }
+    .back-btn:hover { color: var(--music-text); }
+    .back-arrow { width:7px; height:7px; border-left:1px solid currentColor; border-top:1px solid currentColor; transform:rotate(-45deg); }
 
-    .header-title {
-      font-family: var(--font-serif);
-      font-weight: 300;
+    .m-title {
+      font-family: var(--font-serif); font-weight:300;
       font-size: clamp(1.9rem, 7vw, 2.6rem);
-      letter-spacing: 0.06em;
-      color: var(--text);
-      line-height: 1;
+      letter-spacing:0.06em; color: var(--music-text); line-height:1;
+    }
+    .m-sub {
+      font-family: var(--font-serif); font-style:italic; font-size:0.82rem;
+      color: var(--music-text-dim); margin-top:0.3rem; letter-spacing:0.05em;
     }
 
-    .header-sub {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      letter-spacing: 0.05em;
-      margin-top: 0.3rem;
-    }
-
-    /* ── Divider ── */
     .h-rule {
       height: 1px;
-      background: linear-gradient(to right, var(--line), transparent);
+      background: linear-gradient(to right, var(--music-line), transparent);
       margin: 1.2rem 1.6rem 0;
       opacity: 0;
       animation: rise 1.4s ease 0.55s forwards;
     }
 
-    /* ── Now playing banner (top of list, main song) ── */
+    /* ── Top song banner ── */
     .top-song {
       flex-shrink: 0;
       margin: 1rem 1.6rem 0;
       padding: 1rem 1.2rem;
-      background: linear-gradient(135deg, rgba(232,180,192,0.18) 0%, rgba(220,215,225,0.12) 100%);
-      border: 1px solid rgba(232,180,192,0.32);
+      background: linear-gradient(135deg, rgba(216,141,163,0.18) 0%, rgba(220,215,225,0.12) 100%);
+      border: 1px solid rgba(216,141,163,0.32);
       border-radius: 3px;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      display: flex; align-items:center; gap:1rem;
       cursor: pointer;
       transition: background 0.3s ease, border-color 0.3s ease;
       opacity: 0;
@@ -140,333 +99,198 @@
       overflow: hidden;
     }
     .top-song::before {
-      content: '';
-      position: absolute;
-      top:0; left:0; right:0; height:1px;
-      background: linear-gradient(to right, transparent, rgba(232,180,192,0.4), transparent);
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(to right, transparent, rgba(216,141,163,0.5), transparent);
     }
-    .top-song:hover { background: linear-gradient(135deg, rgba(232,180,192,0.26) 0%, rgba(220,215,225,0.18) 100%); border-color: rgba(232,180,192,0.45); }
-    .top-song.playing { border-color: rgba(232,180,192,0.45); }
+    .top-song:hover { background: linear-gradient(135deg, rgba(216,141,163,0.26) 0%, rgba(220,215,225,0.18) 100%); border-color: rgba(216,141,163,0.45); }
+    .top-song.playing { border-color: rgba(216,141,163,0.5); }
 
     .top-song-badge {
-      font-size: 0.46rem;
-      font-weight: 200;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--pink);
-      margin-bottom: 0.25rem;
-      display: block;
+      font-size:0.46rem; font-weight:200; letter-spacing:0.4em; text-transform:uppercase;
+      color: var(--music-pink-soft); margin-bottom:0.25rem; display:block;
     }
-
     .top-song-name {
-      font-family: var(--font-serif);
-      font-weight: 400;
-      font-style: italic;
-      font-size: 1.15rem;
-      color: var(--text);
-      letter-spacing: 0.03em;
-      line-height: 1.2;
+      font-family: var(--font-serif); font-weight:400; font-style:italic;
+      font-size:1.15rem; color: var(--music-text); letter-spacing:0.03em; line-height:1.2;
     }
-
     .top-song-note {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin-top: 0.2rem;
-      letter-spacing: 0.03em;
+      font-family: var(--font-serif); font-style:italic; font-size:0.78rem;
+      color: var(--music-text-dim); margin-top:0.2rem; letter-spacing:0.03em;
     }
 
     .top-song-play {
-      margin-left: auto;
-      flex-shrink: 0;
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: rgba(232,180,192,0.12);
-      border: 1px solid rgba(232,180,192,0.28);
-      display: flex; align-items:center; justify-content:center;
+      margin-left:auto; flex-shrink:0; width:38px; height:38px; border-radius:50%;
+      background: rgba(216,141,163,0.14);
+      border: 1px solid rgba(216,141,163,0.32);
+      display:flex; align-items:center; justify-content:center;
       transition: background 0.3s ease, box-shadow 0.3s ease;
     }
     .top-song:hover .top-song-play,
     .top-song.playing .top-song-play {
-      background: rgba(232,180,192,0.22);
-      box-shadow: 0 0 16px rgba(232,180,192,0.25);
+      background: rgba(216,141,163,0.24);
+      box-shadow: 0 0 16px rgba(216,141,163,0.22);
     }
-    .play-icon { width:10px; height:12px; fill: var(--pink-soft); margin-left:2px; }
+    .play-icon { width:10px; height:12px; fill: var(--music-pink-soft); margin-left:2px; }
     .pause-icon { display:none; }
-    .top-song.playing .play-icon  { display:none; }
+    .top-song.playing .play-icon { display:none; }
     .top-song.playing .pause-icon { display:block; }
 
-    /* ── Columns label ── */
+    /* ── Column labels ── */
     .cols-label {
-      flex-shrink: 0;
-      display: flex;
-      padding: 0.9rem 1.6rem 0;
-      gap: 1rem;
-      opacity: 0;
-      animation: rise 1.4s ease 0.8s forwards;
+      flex-shrink:0; display:flex; padding:0.9rem 1.6rem 0; gap:1rem;
+      opacity:0; animation: rise 1.4s ease 0.8s forwards;
     }
     .col-head {
-      flex: 1;
-      font-size: 0.5rem;
-      font-weight: 200;
-      letter-spacing: 0.42em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--line);
+      flex:1; font-size:0.5rem; font-weight:200; letter-spacing:0.42em; text-transform:uppercase;
+      color: var(--music-text-dim); padding-bottom:0.5rem;
+      border-bottom: 1px solid var(--music-line);
     }
 
-    /* ── Song list ── */
+    /* ── List ── */
     .list-wrap {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 0 1.6rem;
-      padding-bottom: calc(var(--player-h) + 1.5rem);
+      flex:1; overflow-y:auto; overflow-x:hidden;
+      padding: 0 1.6rem; padding-bottom: calc(var(--player-h) + 1.5rem);
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      opacity: 0;
-      animation: rise 1.6s var(--ease-out) 0.9s forwards;
+      opacity:0; animation: rise 1.6s var(--ease-out) 0.9s forwards;
     }
     .list-wrap::-webkit-scrollbar { display:none; }
 
-    /* two-column grid */
     .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0 1rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem;
       padding-top: 0.6rem;
     }
 
-    /* ── Song row ── */
     .song-row {
-      display: flex;
-      flex-direction: column;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid var(--line);
-      cursor: pointer;
-      transition: background 0.2s ease;
-      border-radius: 2px;
+      display:flex; flex-direction:column; padding:0.75rem 0;
+      border-bottom: 1px solid var(--music-line);
+      cursor:pointer; transition: background 0.2s ease; border-radius:2px;
       position: relative;
     }
-    .song-row:active { background: rgba(232,180,192,0.1); }
-
-    .song-row.playing .song-name { color: var(--pink-soft); }
-    .song-row.playing .song-note { color: rgba(232,180,192,0.55); }
+    .song-row:active { background: rgba(216,141,163,0.1); }
+    .song-row.playing .song-name { color: var(--music-pink-soft); }
+    .song-row.playing .song-note { color: rgba(216,141,163,0.65); }
     .song-row.playing::before {
-      content: '';
-      position: absolute;
-      left: -8px; top: 50%;
+      content:''; position:absolute; left:-8px; top:50%;
       transform: translateY(-50%);
-      width: 2px; height: 60%;
-      background: var(--pink);
+      width:2px; height:60%;
+      background: var(--music-pink);
       border-radius: 999px;
     }
 
     .song-name {
-      font-family: var(--font-serif);
-      font-weight: 400;
-      font-style: italic;
-      font-size: 0.92rem;
-      color: var(--text);
-      letter-spacing: 0.02em;
-      line-height: 1.3;
+      font-family: var(--font-serif); font-weight:400; font-style:italic;
+      font-size:0.92rem; color: var(--music-text); letter-spacing:0.02em; line-height:1.3;
       transition: color 0.25s ease;
     }
-
     .song-note {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 0.66rem;
-      color: var(--text-dim);
-      margin-top: 0.18rem;
-      letter-spacing: 0.02em;
-      line-height: 1.4;
+      font-family: var(--font-serif); font-style:italic; font-size:0.66rem;
+      color: var(--music-text-dim); margin-top:0.18rem; letter-spacing:0.02em; line-height:1.4;
       transition: color 0.25s ease;
     }
 
     /* ── Mini player ── */
     .player {
-      position: fixed;
-      bottom: 0; left:0; right:0;
-      height: var(--player-h);
-      z-index: 100;
+      position: fixed; bottom:0; left:0; right:0;
+      height: var(--player-h); z-index:100;
       background: rgba(238,235,230,0.96);
-      border-top: 1px solid rgba(232,180,192,0.28);
+      border-top: 1px solid rgba(216,141,163,0.28);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      display: flex;
-      flex-direction: column;
+      display:flex; flex-direction:column;
       padding: 0 1.4rem;
       padding-bottom: env(safe-area-inset-bottom, 0);
     }
 
-    /* progress bar at very top of player */
     .progress-wrap {
-      height: 2px;
-      background: rgba(180,175,170,0.25);
-      cursor: pointer;
-      position: relative;
-      margin: 0 -1.4rem;
-      flex-shrink: 0;
+      height:2px; background: rgba(180,175,170,0.25);
+      cursor:pointer; position:relative; margin:0 -1.4rem; flex-shrink:0;
     }
     .progress-fill {
-      height: 100%;
-      background: linear-gradient(to right, rgba(232,180,192,0.7), var(--pink-soft));
-      width: 0%;
-      transition: width 0.3s linear;
-      position: relative;
+      height:100%;
+      background: linear-gradient(to right, rgba(216,141,163,0.75), var(--music-pink-soft));
+      width:0%; transition: width 0.3s linear; position:relative;
     }
     .progress-fill::after {
-      content:'';
-      position:absolute; right:-3px; top:50%;
-      transform:translateY(-50%);
+      content:''; position:absolute; right:-3px; top:50%; transform:translateY(-50%);
       width:6px; height:6px; border-radius:50%;
-      background: var(--pink-soft);
-      box-shadow: 0 0 6px rgba(232,180,192,0.8);
+      background: var(--music-pink-soft);
+      box-shadow: 0 0 6px rgba(216,141,163,0.7);
     }
 
-    /* player row */
-    .player-row {
-      flex:1;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    /* song info */
+    .player-row { flex:1; display:flex; align-items:center; gap:1rem; }
     .player-info { flex:1; min-width:0; }
     .player-name {
-      font-family: var(--font-serif);
-      font-weight: 400;
-      font-style: italic;
-      font-size: 0.95rem;
-      color: var(--text);
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-family: var(--font-serif); font-weight:400; font-style:italic;
+      font-size:0.95rem; color: var(--music-text); letter-spacing:0.02em;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .player-note {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      margin-top: 0.1rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-family: var(--font-serif); font-style:italic; font-size:0.65rem;
+      color: var(--music-text-dim); margin-top:0.1rem;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
 
-    /* controls */
-    .player-controls {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-shrink: 0;
-    }
-
+    .player-controls { display:flex; align-items:center; gap:1rem; flex-shrink:0; }
     .ctrl-btn {
-      background: none; border: none; cursor: pointer;
-      color: var(--text-mid);
-      display: flex; align-items:center; justify-content:center;
-      transition: color 0.25s ease, transform 0.2s ease;
-      padding: 4px;
+      background:none; border:none; cursor:pointer; color: var(--music-text-mid);
+      display:flex; align-items:center; justify-content:center;
+      transition: color 0.25s ease, transform 0.2s ease; padding:4px;
     }
-    .ctrl-btn:hover { color: var(--pink-soft); }
+    .ctrl-btn:hover { color: var(--music-pink-soft); }
     .ctrl-btn:active { transform: scale(0.88); }
 
     .ctrl-play {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(232,180,192,0.18) 0%, rgba(184,176,200,0.1) 100%);
-      border: 1px solid rgba(232,180,192,0.3);
-      color: var(--pink-soft);
-      box-shadow: 0 0 14px rgba(232,180,192,0.15);
+      width:40px; height:40px; border-radius:50%;
+      background: linear-gradient(135deg, rgba(216,141,163,0.2) 0%, rgba(184,176,200,0.12) 100%);
+      border: 1px solid rgba(216,141,163,0.32);
+      color: var(--music-pink-soft);
+      box-shadow: 0 0 14px rgba(216,141,163,0.18);
       transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
     }
     .ctrl-play:hover {
-      background: linear-gradient(135deg, rgba(232,180,192,0.28) 0%, rgba(184,176,200,0.18) 100%);
-      box-shadow: 0 0 22px rgba(232,180,192,0.28);
+      background: linear-gradient(135deg, rgba(216,141,163,0.3) 0%, rgba(184,176,200,0.2) 100%);
+      box-shadow: 0 0 22px rgba(216,141,163,0.3);
     }
     .ctrl-play:active { transform: scale(0.9); }
 
-    /* time */
     .player-time {
-      font-size: 0.52rem;
-      font-weight: 200;
-      letter-spacing: 0.08em;
-      color: var(--text-dim);
-      flex-shrink: 0;
-      min-width: 36px;
-      text-align: right;
+      font-size:0.52rem; font-weight:200; letter-spacing:0.08em;
+      color: var(--music-text-dim); flex-shrink:0; min-width:36px; text-align:right;
     }
 
-    /* ── Equalizer bars (playing indicator) ── */
-    .eq {
-      display: flex;
-      align-items: flex-end;
-      gap: 2px;
-      height: 14px;
-      flex-shrink: 0;
-    }
+    .eq { display:flex; align-items:flex-end; gap:2px; height:14px; flex-shrink:0; }
     .eq-bar {
-      width: 2.5px;
-      background: var(--pink);
-      border-radius: 1px;
-      animation: eqBounce 0.8s ease-in-out infinite;
-      opacity: 0;
+      width:2.5px; background: var(--music-pink); border-radius:1px;
+      animation: eqBounce 0.8s ease-in-out infinite; opacity:0;
     }
-    .eq-bar:nth-child(1) { animation-delay: 0s;    --h: 6px;  }
-    .eq-bar:nth-child(2) { animation-delay: 0.15s; --h: 12px; }
-    .eq-bar:nth-child(3) { animation-delay: 0.3s;  --h: 8px;  }
-    .eq-bar:nth-child(4) { animation-delay: 0.1s;  --h: 10px; }
-    .eq-bar.active { opacity: 1; }
+    .eq-bar:nth-child(1){animation-delay:0s; --h:6px;}
+    .eq-bar:nth-child(2){animation-delay:0.15s; --h:12px;}
+    .eq-bar:nth-child(3){animation-delay:0.3s; --h:8px;}
+    .eq-bar:nth-child(4){animation-delay:0.1s; --h:10px;}
+    .eq-bar.active { opacity:1; }
 
-    @keyframes eqBounce {
-      0%,100% { height: 3px; }
-      50%      { height: var(--h); }
-    }
-
-    /* ── Veil ── */
-    #veil {
-      position:fixed; inset:0; background:#f2f0ed; z-index:1000;
-      opacity:1; pointer-events:all;
-      transition: opacity 0.9s ease;
-    }
-    #veil.clear { opacity:0; pointer-events:none; }
-
-    /* ── Keyframes ── */
-    @keyframes rise {
-      from { opacity:0; transform:translateY(14px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
+    @keyframes eqBounce { 0%,100%{height:3px;} 50%{height:var(--h);} }
   </style>
 </head>
 <body>
 
-<canvas id="sky"></canvas>
-<div class="amb"></div>
+<canvas id="sky-canvas"></canvas>
+<div class="ambient-base"></div>
 
 <div class="page">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-top">
-      <button class="back-btn" onclick="window.location.href='home.html'">
-        <span class="back-arrow"></span>
-        <span>Home</span>
-      </button>
-    </div>
-    <h1 class="header-title">Late Night Radio</h1>
-    <p class="header-sub">songs that sound like you</p>
+  <div class="m-header">
+    <button class="back-btn" onclick="window.navigateTo('home.html')">
+      <span class="back-arrow"></span><span>Home</span>
+    </button>
+    <h1 class="m-title">Late Night Radio</h1>
+    <p class="m-sub">songs that sound like you</p>
   </div>
 
   <div class="h-rule"></div>
 
-  <!-- Top song: Goodnight (Heyt) -->
-  <div class="top-song" id="topSong" onclick="playTop()">
+  <div class="top-song" id="topSong">
     <div style="flex:1;min-width:0;">
       <span class="top-song-badge">Tonight's Song</span>
       <div class="top-song-name">Goodnight</div>
@@ -475,36 +299,30 @@
     <div class="top-song-play">
       <svg class="play-icon" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>
       <svg class="pause-icon" width="10" height="12" viewBox="0 0 10 12" fill="none">
-        <rect x="0" y="0" width="3.5" height="12" rx="1" fill="#f0ccd6"/>
-        <rect x="6.5" y="0" width="3.5" height="12" rx="1" fill="#f0ccd6"/>
+        <rect x="0" y="0" width="3.5" height="12" rx="1" fill="currentColor"/>
+        <rect x="6.5" y="0" width="3.5" height="12" rx="1" fill="currentColor"/>
       </svg>
     </div>
   </div>
 
-  <!-- Two col labels -->
   <div class="cols-label">
     <div class="col-head">Songs 1–16</div>
     <div class="col-head">Songs a–p</div>
   </div>
 
-  <!-- Song list -->
   <div class="list-wrap">
     <div class="two-col" id="songGrid"></div>
   </div>
 
 </div>
 
-<!-- Mini player -->
 <div class="player" id="player">
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-fill" id="progressFill"></div>
   </div>
   <div class="player-row">
     <div class="eq" id="eq">
-      <div class="eq-bar"></div>
-      <div class="eq-bar"></div>
-      <div class="eq-bar"></div>
-      <div class="eq-bar"></div>
+      <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
     </div>
     <div class="player-info">
       <div class="player-name" id="pName">Select a song</div>
@@ -513,8 +331,7 @@
     <div class="player-controls">
       <button class="ctrl-btn" id="prevBtn" title="Previous">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <polygon points="15,2 5,8 15,14"/>
-          <rect x="1" y="2" width="2.5" height="12" rx="1"/>
+          <polygon points="15,2 5,8 15,14"/><rect x="1" y="2" width="2.5" height="12" rx="1"/>
         </svg>
       </button>
       <button class="ctrl-btn ctrl-play" id="playBtn" title="Play/Pause">
@@ -526,8 +343,7 @@
       </button>
       <button class="ctrl-btn" id="nextBtn" title="Next">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <polygon points="1,2 11,8 1,14"/>
-          <rect x="12.5" y="2" width="2.5" height="12" rx="1"/>
+          <polygon points="1,2 11,8 1,14"/><rect x="12.5" y="2" width="2.5" height="12" rx="1"/>
         </svg>
       </button>
     </div>
@@ -537,81 +353,19 @@
 
 <div id="veil"></div>
 
+<script src="js/stars.js" defer></script>
+<script src="js/music.js" defer></script>
 <script>
-/* ══ Song data ════════════════════════════════════════════ */
-// Column 1: numbered (1-16)   →  files: 1.mp3 … 16.mp3
-// Column 2: lettered (a-p)    →  files: a.mp3 … p.mp3
-// top.mp3 = Goodnight (Heyt)
-
-const COL1 = [
-  { file:'1.mp3',  name:'Another Love',         note:'I\'d choose you, in every lifetime.' },
-  { file:'2.mp3',  name:'Double Take',           note:'you still give me butterflies.' },
-  { file:'3.mp3',  name:'Give Me Your Forever',  note:'you\'re my always.' },
-  { file:'4.mp3',  name:'Glimpse of Us',         note:'even in another life, it\'s you.' },
-  { file:'5.mp3',  name:'Heat Wave',             note:'distance means nothing to us.' },
-  { file:'6.mp3',  name:'Heather',               note:'you make me feel enough.' },
-  { file:'7.mp3',  name:'I Wanna Be Yours',      note:'I just wanna be yours.' },
-  { file:'8.mp3',  name:'It\'s You',             note:'it\'s always been you.' },
-  { file:'9.mp3',  name:'Love Me Like You Do',   note:'love me your way.' },
-  { file:'10.mp3', name:'Lovers Rock',           note:'you feel like home.' },
-  { file:'11.mp3', name:'Past Lives',            note:'maybe we\'ve loved before.' },
-  { file:'12.mp3', name:'Salvatore',             note:'you\'re my beautiful chaos.' },
-  { file:'13.mp3', name:'Satisfaction',          note:'nothing compares to you.' },
-  { file:'14.mp3', name:'Talking to the Moon',   note:'if you can\'t hear me, moon can.' },
-  { file:'15.mp3', name:'Until I Found You',     note:'finding you was worth it.' },
-  { file:'16.mp3', name:'Wildflower',            note:'you bloom in your own way.' },
-];
-
-const COL2 = [
-  { file:'a.mp3',  name:'Baby Don\'t Cut',       note:'stay, because tomorrow can be better.' },
-  { file:'b.mp3',  name:'Back to Friends',       note:'some goodbyes aren\'t meant to be forever.' },
-  { file:'c.mp3',  name:'Creep',                 note:'i just want to feel like I belong.' },
-  { file:'d.mp3',  name:'Dollhouse',             note:'perfect outside, broken inside.' },
-  { file:'e.mp3',  name:'Everything I Wanted',   note:'dreams mean more when you have a reason.' },
-  { file:'f.mp3',  name:'Family Line',           note:'healing isn\'t always linear.' },
-  { file:'g.mp3',  name:'Home',                  note:'home is a feeling, not a place.' },
-  { file:'h.mp3',  name:'Let Down',              note:'it\'s okay to feel let down sometimes.' },
-  { file:'i.mp3',  name:'Limbo',                 note:'stuck for now, not forever.' },
-  { file:'j.mp3',  name:'Male Fantasy',          note:'the truth sets you free.' },
-  { file:'k.mp3',  name:'Matilda',               note:'you deserve better.' },
-  { file:'l.mp3',  name:'Memories',              note:'some memories never fade.' },
-  { file:'m.mp3',  name:'My Mind and Me',        note:'learning to be okay with me.' },
-  { file:'n.mp3',  name:'Older',                 note:'growing up hurts.' },
-  { file:'o.mp3',  name:'Playdate',              note:'not every bond is real.' },
-  { file:'p.mp3',  name:'Ugly',                  note:'you\'re not ugly, just human.' },
-];
-
-const TOP = { file:'top.mp3', name:'Goodnight', note:'— Heyt' };
-
-/* ══ Build grid ═══════════════════════════════════════════ */
-const grid = document.getElementById('songGrid');
-
-function makeSongRow(song, idx, isCol2) {
-  const div = document.createElement('div');
-  div.className = 'song-row';
-  div.dataset.file = 'audio/' + song.file;
-  div.dataset.name = song.name;
-  div.dataset.note = song.note;
-  div.dataset.idx  = isCol2 ? 'b'+idx : 'a'+idx;
-  div.innerHTML = `
-    <div class="song-name">${song.name}</div>
-    <div class="song-note">${song.note}</div>
-  `;
-  div.addEventListener('click', () => playSong(song, div));
-  return div;
-}
-
-// interleave col1 and col2 into the 2-col grid
-const maxLen = Math.max(COL1.length, COL2.length);
-for(let i=0; i<maxLen; i++){
-  if(COL1[i]) grid.appendChild(makeSongRow(COL1[i], i, false));
-  else        grid.appendChild(document.createElement('div'));
-  if(COL2[i]) grid.appendChild(makeSongRow(COL2[i], i, true));
-  else        grid.appendChild(document.createElement('div'));
-}
-
-/* ══ Audio engine ═════════════════════════════════════════ */
-const audio     = new Audio();
-let   curSong   = null;
-let   curEl     = null;
-let   allSongs  = [...COL1, ...COL2]
+  // Light theme star config for music page
+  window.SKY_CONFIG = {
+    starCount:      'auto',
+    starColor:      [160, 150, 145],
+    shootingStars:  true,
+    shootColor:     [216, 141, 163],
+    shootGlow:      true,
+    cloudLayer:     false,
+    starBrightness: 0.35,
+  };
+</script>
+</body>
+</html>
