@@ -131,10 +131,11 @@
       const a  = s.base * tw;
 
       if (s.pink) {
-        // soft pink micro-star
+        // soft pink micro-star (uses configured shoot color)
+        const [pr, pg, pb] = CFG.shootColor;
         const rg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 2.5);
-        rg.addColorStop(0, `rgba(240,192,208,${a * 1.4})`);
-        rg.addColorStop(1, `rgba(240,192,208,0)`);
+        rg.addColorStop(0, `rgba(${pr},${pg},${pb},${a * 1.4})`);
+        rg.addColorStop(1, `rgba(${pr},${pg},${pb},0)`);
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r * 2.5, 0, Math.PI * 2);
         ctx.fillStyle = rg;
@@ -143,7 +144,7 @@
 
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      const [r, g, b] = s.pink ? [240, 192, 208] : CFG.starColor;
+      const [r, g, b] = s.pink ? CFG.shootColor : CFG.starColor;
       ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
       ctx.fill();
     }
@@ -184,12 +185,13 @@
         const ty = cm.y - Math.sin(cm.angle) * cm.len;
 
         // trail gradient
+        const [pr, pg, pb] = CFG.shootColor;
         const g = ctx.createLinearGradient(tx, ty, cm.x, cm.y);
         if (cm.pink) {
-          g.addColorStop(0,    `rgba(240,192,208,0)`);
-          g.addColorStop(0.45, `rgba(240,192,208,${cm.a * 0.35})`);
-          g.addColorStop(0.8,  `rgba(248,210,220,${cm.a * 0.7})`);
-          g.addColorStop(1,    `rgba(255,230,238,${cm.a})`);
+          g.addColorStop(0,    `rgba(${pr},${pg},${pb},0)`);
+          g.addColorStop(0.45, `rgba(${pr},${pg},${pb},${cm.a * 0.35})`);
+          g.addColorStop(0.8,  `rgba(${Math.min(255,pr+8)},${Math.min(255,pg+18)},${Math.min(255,pb+12)},${cm.a * 0.7})`);
+          g.addColorStop(1,    `rgba(${Math.min(255,pr+15)},${Math.min(255,pg+38)},${Math.min(255,pb+30)},${cm.a})`);
         } else {
           g.addColorStop(0,    `rgba(230,220,210,0)`);
           g.addColorStop(0.5,  `rgba(230,220,210,${cm.a * 0.4})`);
@@ -205,7 +207,7 @@
 
         // tip glow
         if (CFG.shootGlow) {
-          const tipColor = cm.pink ? [255, 210, 225] : [255, 248, 240];
+          const tipColor = cm.pink ? CFG.shootColor.map((v,i)=>Math.min(255, v + [15,38,30][i])) : [255, 248, 240];
           const rg = ctx.createRadialGradient(cm.x, cm.y, 0, cm.x, cm.y, cm.pink ? 5 : 3.5);
           rg.addColorStop(0, `rgba(${tipColor},${cm.a * 0.95})`);
           rg.addColorStop(1, `rgba(${tipColor},0)`);
@@ -216,9 +218,10 @@
 
           // extra outer halo for pink
           if (cm.pink) {
+            const [hr, hg, hb] = CFG.shootColor;
             const halo = ctx.createRadialGradient(cm.x, cm.y, 0, cm.x, cm.y, 12);
-            halo.addColorStop(0, `rgba(240,192,208,${cm.a * 0.35})`);
-            halo.addColorStop(1, `rgba(240,192,208,0)`);
+            halo.addColorStop(0, `rgba(${hr},${hg},${hb},${cm.a * 0.35})`);
+            halo.addColorStop(1, `rgba(${hr},${hg},${hb},0)`);
             ctx.beginPath();
             ctx.arc(cm.x, cm.y, 12, 0, Math.PI * 2);
             ctx.fillStyle = halo;
@@ -253,4 +256,3 @@
   window.SkyCanvas = { getCtx: () => ctx, getSize: () => ({ W, H }) };
 
 })();
-  
