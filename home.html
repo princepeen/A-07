@@ -1,1 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Home — Ashu</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0a0a0f"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <style>
+    /* ── home.html layout ── */
+    html, body { overflow: hidden; }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.4rem 1.5rem 2.2rem;
+    }
+
+    /* ══ Counter section (top, focal point) ══ */
+    .counter-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: clamp(2.4rem, 6vh, 3.6rem);
+      opacity: 0;
+      animation: rise 1.8s var(--ease-out) 0.3s forwards;
+    }
+
+    .counter-eyebrow {
+      font-size: 0.55rem;
+      font-weight: 200;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    .counter-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.65rem;
+    }
+
+    .counter-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .counter-digit {
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-size: clamp(1.7rem, 7.5vw, 2.5rem);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      background: linear-gradient(160deg, #eae4dc 0%, #c8bdb4 55%, #b6b0c6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-width: 1.6ch;
+      text-align: center;
+    }
+
+    .counter-label {
+      font-size: 0.46rem;
+      font-weight: 200;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .counter-colon {
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-size: clamp(1.3rem, 5vw, 1.8rem);
+      color: var(--text-dim);
+      opacity: 0.4;
+      transform: translateY(-0.5em);
+    }
+
+    .counter-caption {
+      margin-top: 1.1rem;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--accent-lavender);
+      letter-spacing: 0.04em;
+    }
+
+    /* ══ Card grid (2x2) ══ */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 360px;
+      opacity: 0;
+      animation: rise 1.8s var(--ease-out) 0.7s forwards;
+    }
+
+    .nav-cell {
+      aspect-ratio: 1.35 / 1;
+    }
+
+    /* cloud-btn already styled in style.css; extend it here */
+    .nav-cell .cloud-btn {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
+
+    .nav-cell .cloud-btn-inner {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-icon {
+      font-size: 1.05rem;
+      opacity: 0.75;
+      filter: grayscale(0.4) brightness(1.1);
+    }
+
+    /* ══ Surprise section (hidden until unlocked) ══ */
+    .surprise-wrap {
+      margin-top: 0;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      transition: max-height 0.8s var(--ease-out), opacity 0.7s ease, margin-top 0.8s var(--ease-out);
+    }
+
+    .surprise-wrap.unlocked {
+      margin-top: 1.7rem;
+      max-height: 160px;
+      opacity: 1;
+    }
+
+    .surprise-cell {
+      width: 128px;
+      aspect-ratio: 1 / 1;
+    }
+
+    .surprise-cell .cloud-btn {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
+
+    .surprise-cell .cloud-btn-label {
+      font-size: 0.54rem;
+    }
+
+    .surprise-cell .nav-icon {
+      font-size: 0.95rem;
+    }
+
+    /* gentle glow pulse to draw attention once unlocked */
+    .surprise-cell.pulse .cloud-btn {
+      animation: surprisePulse 2.4s ease-in-out infinite;
+    }
+    @keyframes surprisePulse {
+      0%, 100% { filter: drop-shadow(0 0 0 rgba(232,180,192,0)); }
+      50%      { filter: drop-shadow(0 0 14px rgba(232,180,192,0.35)); }
+    }
+
+    /* checkmark badge on opened cards */
+    .nav-cell.opened .cloud-btn::after {
+      content: '';
+    }
+    .opened-dot {
+      position: absolute;
+      top: 8px; right: 10px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent-pink);
+      opacity: 0;
+      box-shadow: 0 0 8px rgba(232,180,192,0.7);
+      transition: opacity 0.4s ease;
+      z-index: 3;
+    }
+    .nav-cell.opened .opened-dot { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<canvas id="sky-canvas"></canvas>
+<div class="ambient-cloud"></div>
+<div id="fog-layer" style="position:fixed; inset:0; z-index:2; pointer-events:none; overflow:hidden;"></div>
+
+<div class="page">
+
+  <!-- Counter -->
+  <div class="counter-section">
+    <span class="counter-eyebrow">together for</span>
+    <div class="counter-row">
+      <div class="counter-unit">
+        <span class="counter-digit" id="c-days">0</span>
+        <span class="counter-label">days</span>
+      </div>
+      <span class="counter-colon">·</span>
+      <div class="counter-unit">
+        <span class="counter-digit" id="c-hours">00</span>
+        <span class="counter-label">hrs</span>
+      </div>
+      <span class="counter-colon">:</span>
+      <div class="counter-unit">
+        <span class="counter-digit" id="c-minutes">00</span>
+        <span class="counter-label">min</span>
+      </div>
+      <span class="counter-colon">:</span>
+      <div class="counter-unit">
+        <span class="counter-digit" id="c-seconds">00</span>
+        <span class="counter-label">sec</span>
+      </div>
+    </div>
+    <p class="counter-caption">and counting, Ashu</p>
+  </div>
+
+  <!-- Nav grid 2x2 -->
+  <div class="nav-grid">
+    <div class="nav-cell" data-target="dateideas.html" data-key="dateideas">
+      <div class="opened-dot"></div>
+      <button class="cloud-btn">
+        <div class="cloud-btn-inner">
+          <span class="nav-icon">✦</span>
+          <span class="cloud-btn-label">Date Ideas</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="nav-cell" data-target="music.html" data-key="music">
+      <div class="opened-dot"></div>
+      <button class="cloud-btn">
+        <div class="cloud-btn-inner">
+          <span class="nav-icon">♪</span>
+          <span class="cloud-btn-label">Music</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="nav-cell" data-target="letters.html" data-key="letters">
+      <div class="opened-dot"></div>
+      <button class="cloud-btn">
+        <div class="cloud-btn-inner">
+          <span class="nav-icon">✉</span>
+          <span class="cloud-btn-label">Letters</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="nav-cell" data-target="timeline.html" data-key="timeline">
+      <div class="opened-dot"></div>
+      <button class="cloud-btn">
+        <div class="cloud-btn-inner">
+          <span class="nav-icon">◷</span>
+          <span class="cloud-btn-label">Timeline</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Surprise (hidden until all 4 opened) -->
+  <div class="surprise-wrap" id="surpriseWrap">
+    <div class="surprise-cell pulse" data-target="surprise.html" data-key="surprise">
+      <button class="cloud-btn">
+        <div class="cloud-btn-inner">
+          <span class="nav-icon">✧</span>
+          <span class="cloud-btn-label">Surprise</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div id="starburst"></div>
+<div id="veil"></div>
+
+<script src="js/stars.js" defer></script>
+<script src="js/app.js" defer></script>
+<script src="js/counter.js" defer></script>
+<script src="js/home.js" defer></script>
+<script>
+  window.SKY_CONFIG = {
+    starCount:      'auto',
+    starColor:      [222, 212, 202],
+    shootingStars:  true,
+    shootColor:     [232, 180, 192],
+    shootGlow:      true,
+    cloudLayer:     true,
+    cloudOpacity:   0.08,
+    starBrightness: 0.5,
+  };
+</script>
+</body>
+</html>
 
