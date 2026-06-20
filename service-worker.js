@@ -8,9 +8,9 @@
    - Everything else → Network First, fallback to cache
    ============================================================ */
 
-const CACHE_NAME    = 'ashu-v2';
-const AUDIO_CACHE   = 'ashu-audio-v2';
-const IMG_CACHE     = 'ashu-img-v2';
+const CACHE_NAME    = 'ashu-v5';
+const AUDIO_CACHE   = 'ashu-audio-v5';
+const IMG_CACHE     = 'ashu-img-v5';
 
 /* Files to pre-cache on install (the app shell) */
 const SHELL = [
