@@ -2,7 +2,7 @@
   "name": "For Ashu",
   "short_name": "Ashu",
   "description": "A birthday gift, made for one person.",
-  "start_url": "/index.html",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0a0f",
