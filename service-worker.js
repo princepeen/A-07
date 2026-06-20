@@ -1,134 +1,115 @@
 /* ============================================================
-   SERVICE-WORKER.JS
-   Birthday PWA for Ashu
-   Strategy:
-   - Shell (HTML/CSS/JS/fonts) → Cache First
-   - Images → Cache First, fallback to network
-   - Audio → Network First (large files, stream better)
-   - Everything else → Network First, fallback to cache
+   SERVICE WORKER (GitHub Pages SAFE)
+   Base path: /A-07/
    ============================================================ */
 
-const CACHE_NAME    = 'ashu-v5';
-const AUDIO_CACHE   = 'ashu-audio-v5';
-const IMG_CACHE     = 'ashu-img-v5';
+const BASE = "/A-07";
 
-/* Files to pre-cache on install (the app shell) */
-const SHELL = [
-  '/',
-  '/index.html',
-  '/password.html',
-  '/home.html',
-  '/timeline.html',
-  '/letters.html',
-  '/music.html',
-  '/dateideas.html',
-  '/surprise.html',
-  '/css/style.css',
-  '/css/animations.css',
-  '/js/app.js',
-  '/js/stars.js',
-  '/js/counter.js',
-  '/js/home.js',
-  '/js/music.js',
-  '/js/dateideas.js',
-  /* Google Fonts are handled separately — cached on first fetch */
+const CACHE_NAME  = "ashu-v6";
+const IMG_CACHE   = "ashu-img-v6";
+const AUDIO_CACHE = "ashu-audio-v6";
+
+/* Core app shell (minimal = install-safe) */
+const CORE = [
+  BASE + "/",
+  BASE + "/index.html",
+  BASE + "/manifest.json",
+  BASE + "/css/style.css",
+  BASE + "/js/app.js"
 ];
 
-/* ── Install: pre-cache shell ── */
-self.addEventListener('install', event => {
+/* ── INSTALL ── */
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(async cache => {
+      // safer than addAll → prevents total failure on one bad file
+      for (const url of CORE) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) await cache.put(url, res.clone());
+        } catch (e) {
+          // ignore failures (important for install success)
+        }
+      }
+    }).then(() => self.skipWaiting())
   );
 });
 
-/* ── Activate: clean old caches ── */
-self.addEventListener('activate', event => {
-  const VALID = [CACHE_NAME, AUDIO_CACHE, IMG_CACHE];
+/* ── ACTIVATE ── */
+self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys
-          .filter(k => !VALID.includes(k))
-          .map(k => caches.delete(k))
+        keys.map(k => {
+          if (![CACHE_NAME, IMG_CACHE, AUDIO_CACHE].includes(k)) {
+            return caches.delete(k);
+          }
+        })
       )
     ).then(() => self.clients.claim())
   );
 });
 
-/* ── Fetch: routing strategies ── */
-self.addEventListener('fetch', event => {
-  const { request } = event;
-  const url = new URL(request.url);
+/* ── FETCH ── */
+self.addEventListener("fetch", event => {
+  const req = event.request;
 
-  /* Skip non-GET and cross-origin (except Google Fonts) */
-  if (request.method !== 'GET') return;
+  if (req.method !== "GET") return;
 
-  /* ── Google Fonts: cache first ── */
-  if (url.origin === 'https://fonts.googleapis.com' ||
-      url.origin === 'https://fonts.gstatic.com') {
-    event.respondWith(cacheFirst(request, CACHE_NAME));
+  const url = new URL(req.url);
+
+  /* Images */
+  if (url.pathname.startsWith(BASE + "/img/")) {
+    event.respondWith(cacheFirst(req, IMG_CACHE));
     return;
   }
 
-  /* ── Audio files: network first, cache fallback ── */
-  if (url.pathname.startsWith('/audio/')) {
-    event.respondWith(networkFirst(request, AUDIO_CACHE));
+  /* Audio */
+  if (url.pathname.startsWith(BASE + "/audio/")) {
+    event.respondWith(networkFirst(req, AUDIO_CACHE));
     return;
   }
 
-  /* ── Images: cache first ── */
-  if (url.pathname.startsWith('/img/')) {
-    event.respondWith(cacheFirst(request, IMG_CACHE));
-    return;
-  }
-
-  /* ── App shell (HTML/CSS/JS): cache first ── */
+  /* HTML/CSS/JS */
   if (
-    url.pathname.endsWith('.html') ||
-    url.pathname.endsWith('.css')  ||
-    url.pathname.endsWith('.js')   ||
-    url.pathname === '/'
+    url.pathname.endsWith(".html") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname === BASE + "/"
   ) {
-    event.respondWith(cacheFirst(request, CACHE_NAME));
+    event.respondWith(cacheFirst(req, CACHE_NAME));
     return;
   }
 
-  /* ── Everything else: network first ── */
-  event.respondWith(networkFirst(request, CACHE_NAME));
+  /* fallback */
+  event.respondWith(networkFirst(req, CACHE_NAME));
 });
 
-/* ══ Strategy helpers ══════════════════════════════════════ */
+/* ── STRATEGIES ── */
 
-async function cacheFirst(request, cacheName) {
-  const cache  = await caches.open(cacheName);
-  const cached = await cache.match(request);
+async function cacheFirst(req, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(req);
   if (cached) return cached;
 
   try {
-    const response = await fetch(request);
-    if (response && response.status === 200 && response.type !== 'opaque') {
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch (err) {
-    /* offline and not cached — return nothing gracefully */
-    return new Response('', { status: 408, statusText: 'Offline' });
+    const res = await fetch(req);
+    if (res.ok) cache.put(req, res.clone());
+    return res;
+  } catch {
+    return new Response("Offline", { status: 408 });
   }
 }
 
-async function networkFirst(request, cacheName) {
+async function networkFirst(req, cacheName) {
   const cache = await caches.open(cacheName);
+
   try {
-    const response = await fetch(request);
-    if (response && response.status === 200 && response.type !== 'opaque') {
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch (err) {
-    const cached = await cache.match(request);
-    if (cached) return cached;
-    return new Response('', { status: 408, statusText: 'Offline' });
+    const res = await fetch(req);
+    if (res.ok) cache.put(req, res.clone());
+    return res;
+  } catch {
+    const cached = await cache.match(req);
+    return cached || new Response("Offline", { status: 408 });
   }
 }
