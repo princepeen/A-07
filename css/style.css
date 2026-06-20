@@ -9,17 +9,17 @@
 /* ── Design Tokens ── */
 :root {
   /* backgrounds */
-  --bg-deepnight:   #08080e;
-  --bg-night:       #0a0a12;
-  --bg-cloud:       #0e0e18;
-  --bg-glass:       rgba(255,255,255,0.032);
-  --bg-glass-hover: rgba(255,255,255,0.055);
+  --bg-deepnight:   #f5f3f0;
+  --bg-night:       #f0eeed;
+  --bg-cloud:       #f0eeed;
+  --bg-glass:       rgba(255,255,255,0.55);
+  --bg-glass-hover: rgba(255,255,255,0.68);
 
   /* text */
-  --text-primary:   #ddd6ce;
-  --text-secondary: #a09890;
-  --text-dim:       #504c48;
-  --text-white:     #f0ebe5;
+  --text-primary:   #2a2724;
+  --text-secondary: #5a5450;
+  --text-dim:       #9a9390;
+  --text-white:     #2a2724;
 
   /* accents */
   --accent-warm:    #c9b8a8;
@@ -29,22 +29,22 @@
 
   /* shooting star glow */
   --star-pink:      #f0c0d0;
-  --star-glow:      rgba(240,192,208,0.6);
+  --star-glow:      rgba(232,180,192,0.25);
 
   /* cloud / fog */
-  --cloud-light:    rgba(200,196,210,0.06);
-  --cloud-mid:      rgba(180,176,196,0.04);
-  --fog-color:      rgba(210,205,220,0.05);
+  --cloud-light:    rgba(255,255,255,0.40);
+  --cloud-mid:      rgba(255,255,255,0.25);
+  --fog-color:      rgba(255,255,255,0.20);
 
   /* borders & lines */
-  --line:           rgba(201,184,168,0.14);
+  --line:           rgba(160,155,150,0.16);
   --line-pink:      rgba(232,180,192,0.2);
 
   /* glass border */
-  --glass-border:   rgba(255,255,255,0.07);
+  --glass-border:   rgba(255,255,255,0.80);
 
   /* starburst */
-  --burst-color:    rgba(240,192,208,0.9);
+  --burst-color:    rgba(232,180,192,0.90);
 
   /* typography */
   --font-serif:     'Cormorant Garamond', Georgia, serif;
@@ -102,9 +102,9 @@ a      { text-decoration: none; color: inherit; }
   position: fixed; inset: 0; z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 40% at 50% 110%, rgba(180,158,136,0.05) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 25% at 80% 90%,  rgba(184,176,200,0.04) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 20% at 10% 80%,  rgba(200,180,170,0.03) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 40% at 50% 110%, rgba(232,180,192,.08) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 25% at 80% 90%, rgba(184,176,200,.05) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 20% at 10% 80%, rgba(201,184,168,.05) 0%, transparent 50%);
 }
 
 /* Home page gets a cloud-heavy atmosphere */
@@ -112,10 +112,10 @@ a      { text-decoration: none; color: inherit; }
   position: fixed; inset: 0; z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 100% 50% at 50% 0%,   rgba(100,95,115,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 80%  40% at 20% 30%,  rgba(90,88,105,0.08)  0%, transparent 50%),
-    radial-gradient(ellipse 70%  35% at 80% 60%,  rgba(95,90,110,0.07)  0%, transparent 50%),
-    radial-gradient(ellipse 100% 30% at 50% 100%, rgba(80,76,95,0.1)    0%, transparent 40%);
+    radial-gradient(ellipse 100% 50% at 50% 0%, rgba(255,255,255,.45) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 20% 30%, rgba(255,255,255,.30) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 35% at 80% 60%, rgba(255,255,255,.28) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 30% at 50% 100%, rgba(232,180,192,.08) 0%, transparent 40%);
 }
 
 /* ── Page Wrapper ── */
@@ -144,16 +144,20 @@ a      { text-decoration: none; color: inherit; }
 .glass-card {
   background: var(--bg-glass);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(18px) saturate(120%);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 8px 32px rgba(180,170,165,0.15);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 8px 32px rgba(180,170,165,0.15);
   border-radius: 2px;
 }
 
 .glass-card-lg {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(24px) saturate(130%);
-  -webkit-backdrop-filter: blur(24px) saturate(130%);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.80);
+  backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 8px 32px rgba(180,170,165,0.15);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 8px 32px rgba(180,170,165,0.15);
   border-radius: 3px;
 }
 
