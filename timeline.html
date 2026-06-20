@@ -1,1 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Our Story — Ashu</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0a0a0f"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <style>
+    html, body { overflow-x: hidden; }
+
+    .page {
+      min-height: 100vh;
+      padding: 3.2rem 0 5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      padding: 0 1.6rem;
+      margin-bottom: 3.2rem;
+      opacity: 0;
+      animation: rise 1.6s var(--ease-out) 0.2s forwards;
+    }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim);
+      font-size: 0.54rem; font-weight: 200; letter-spacing: 0.35em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      transition: color 0.3s ease;
+    }
+    .back-btn:hover { color: var(--text-primary); }
+    .back-arrow { width: 7px; height: 7px; border-left: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(-45deg); }
+
+    .header-eyebrow {
+      font-size: 0.54rem; font-weight: 200; letter-spacing: 0.44em;
+      text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.6rem;
+    }
+    .header-title {
+      font-family: var(--font-serif); font-weight: 300;
+      font-size: clamp(2rem, 8vw, 2.8rem);
+      letter-spacing: 0.06em; color: var(--text-primary); line-height: 1;
+    }
+    .header-sub {
+      font-family: var(--font-serif); font-style: italic; font-size: 0.86rem;
+      color: var(--accent-lavender); margin-top: 0.5rem; letter-spacing: 0.04em;
+    }
+
+    /* ── Timeline spine + chapters ── */
+    .timeline {
+      width: 100%;
+      max-width: 480px;
+      padding: 0 1.4rem;
+      position: relative;
+    }
+
+    /* vertical centre line */
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: calc(1.4rem + 20px);
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(201,184,168,0.18) 6%,
+        rgba(201,184,168,0.18) 94%,
+        transparent 100%
+      );
+    }
+
+    /* ── Chapter block ── */
+    .chapter {
+      position: relative;
+      padding-left: 58px;
+      margin-bottom: 0.6rem;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+    }
+    .chapter.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* node dot on the spine */
+    .chapter-node {
+      position: absolute;
+      left: calc(20px - 5px); /* centred on spine (spine at left+20px) */
+      top: 22px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--bg-deepnight);
+      border: 1px solid rgba(201,184,168,0.35);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+      z-index: 2;
+    }
+    .chapter.open .chapter-node {
+      background: rgba(232,180,192,0.15);
+      border-color: rgba(232,180,192,0.55);
+      box-shadow: 0 0 10px rgba(232,180,192,0.22);
+    }
+
+    /* connector tick from node to header */
+    .chapter-node::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 100%;
+      transform: translateY(-50%);
+      width: 22px; height: 1px;
+      background: linear-gradient(to right, rgba(201,184,168,0.25), transparent);
+    }
+
+    /* ── Chapter header (clickable) ── */
+    .chapter-header {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 1rem 1.1rem;
+      background: var(--bg-glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 3px;
+      cursor: pointer;
+      backdrop-filter: blur(14px) saturate(110%);
+      -webkit-backdrop-filter: blur(14px) saturate(110%);
+      transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chapter-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.07), transparent);
+    }
+
+    .chapter:hover .chapter-header,
+    .chapter.open  .chapter-header {
+      background: var(--bg-glass-hover);
+      border-color: rgba(201,184,168,0.18);
+    }
+    .chapter.open .chapter-header {
+      border-bottom-color: transparent;
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    }
+
+    .chapter-emoji {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      filter: grayscale(0.25) brightness(1.05);
+      width: 24px; text-align: center;
+    }
+
+    .chapter-meta { flex: 1; min-width: 0; }
+
+    .chapter-label {
+      font-size: 0.48rem; font-weight: 200; letter-spacing: 0.38em;
+      text-transform: uppercase; color: var(--text-dim); display: block;
+      margin-bottom: 0.2rem;
+    }
+    .chapter-title {
+      font-family: var(--font-serif); font-style: italic; font-weight: 400;
+      font-size: 0.98rem; color: var(--text-primary); letter-spacing: 0.02em;
+      line-height: 1.25;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* chevron */
+    .chapter-chevron {
+      flex-shrink: 0;
+      width: 8px; height: 8px;
+      border-right: 1px solid rgba(201,184,168,0.3);
+      border-bottom: 1px solid rgba(201,184,168,0.3);
+      transform: rotate(45deg);
+      transition: transform 0.4s var(--ease-out), border-color 0.3s ease;
+      margin-right: 2px;
+    }
+    .chapter.open .chapter-chevron {
+      transform: rotate(-135deg);
+      border-color: rgba(232,180,192,0.5);
+    }
+
+    /* ── Chapter body (collapsible) ── */
+    .chapter-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.65s var(--ease-out), opacity 0.5s ease;
+      opacity: 0;
+      background: rgba(8,8,14,0.45);
+      border: 1px solid var(--glass-border);
+      border-top: none;
+      border-radius: 0 0 3px 3px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .chapter.open .chapter-body {
+      opacity: 1;
+    }
+
+    .chapter-text {
+      padding: 1.3rem 1.3rem 1.5rem;
+    }
+
+    /* prose styling inside chapters */
+    .chapter-text p {
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+      line-height: 1.85;
+      letter-spacing: 0.015em;
+      margin-bottom: 0.85rem;
+    }
+    .chapter-text p:last-child { margin-bottom: 0; }
+
+    /* short dramatic lines — single-word or 1-2 word paragraphs */
+    .chapter-text p.short {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.86rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 0.45rem;
+      padding-left: 0.8rem;
+      border-left: 1px solid rgba(201,184,168,0.15);
+    }
+
+    /* closing lines */
+    .chapter-text p.closing {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--accent-lavender);
+      margin-top: 1rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* horizontal rule inside text */
+    .chapter-text hr {
+      border: none;
+      border-top: 1px solid rgba(201,184,168,0.1);
+      margin: 1rem 0;
+    }
+
+    /* ── Footer note ── */
+    .timeline-footer {
+      margin-top: 2.4rem;
+      padding: 0 1.6rem;
+      text-align: center;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      max-width: 340px;
+      opacity: 0;
+      animation: rise 1.6s ease 1.2s forwards;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="sky-canvas"></canvas>
+<div class="ambient-base"></div>
+
+<div class="page">
+
+  <div class="header">
+    <button class="back-btn" onclick="window.navigateTo('home.html')">
+      <span class="back-arrow"></span><span>Home</span>
+    </button>
+    <div class="header-eyebrow">our story so far</div>
+    <h1 class="header-title">Timeline</h1>
+    <p class="header-sub">every chapter, written together</p>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <p class="timeline-footer">"We're still in the middle of the story. The best chapters haven't been written yet."</p>
+
+</div>
+
+<div id="starburst"></div>
+<div id="veil"></div>
+
+<script src="js/stars.js" defer></script>
+<script src="js/app.js" defer></script>
+<script>
+  window.SKY_CONFIG = {
+    starCount:      'auto',
+    starColor:      [225, 215, 205],
+    shootingStars:  true,
+    shootColor:     [232, 180, 192],
+    shootGlow:      true,
+    cloudLayer:     false,
+    starBrightness: 0.52,
+  };
+
+  /* ══ Chapter data ═══════════════════════════════════════ */
+  const CHAPTERS = [
+    {
+      emoji: '🌱',
+      label: 'Chapter 1',
+      title: 'A Random Stranger',
+      paragraphs: [
+        { text: 'Every story starts somewhere.', style: '' },
+        { text: 'Ours started with two people who didn\'t know what the future had planned. You were just another person in my life, and I was just another person in yours.', style: '' },
+        { text: 'If someone had told me back then that I\'d spend hours building an entire website for you one day, I probably would\'ve laughed.', style: '' },
+        { text: 'But life has a funny way of introducing us to the people who end up changing it.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '💬',
+      label: 'Chapter 2',
+      title: 'We Started Talking',
+      paragraphs: [
+        { text: 'At first, they were just conversations.', style: '' },
+        { text: 'A few messages here, a few jokes there.', style: 'short' },
+        { text: 'Then somehow, talking to you became one of my favorite parts of the day.', style: '' },
+        { text: 'The conversations became longer.', style: 'short' },
+        { text: 'The goodnights became later.', style: 'short' },
+        { text: 'And before I even realized it, checking my phone meant hoping I\'d see your name.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '🌸',
+      label: 'Chapter 3',
+      title: 'Becoming Close',
+      paragraphs: [
+        { text: 'This is the chapter where you slowly became my comfort.', style: '' },
+        { text: 'Nicknames.', style: 'short' },
+        { text: 'Random conversations that somehow lasted for hours.', style: 'short' },
+        { text: 'Those little moments didn\'t seem important at the time.', style: '' },
+        { text: 'Looking back now, they were quietly becoming some of my favorite memories.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '❤️',
+      label: 'Chapter 4',
+      title: 'Us',
+      paragraphs: [
+        { text: 'Somewhere along the way, "you" and "me" slowly became "us."', style: '' },
+        { text: 'That changed everything.', style: 'short' },
+        { text: 'The little things mattered more.', style: 'short' },
+        { text: 'Your happiness started mattering to me in a way I couldn\'t really explain.', style: '' },
+        { text: 'I started celebrating your wins, worrying on your bad days, and smiling at messages that would\'ve looked completely normal to anyone else.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '🌍',
+      label: 'Chapter 5',
+      title: 'Loving Across the Distance',
+      paragraphs: [
+        { text: 'Long distance isn\'t always easy.', style: '' },
+        { text: 'There are days when I wish I could\'ve been there instead of behind a screen.', style: '' },
+        { text: 'To hug you.', style: 'short' },
+        { text: 'To annoy you.', style: 'short' },
+        { text: 'To celebrate with you.', style: 'short' },
+        { text: 'To simply exist beside you.', style: 'short' },
+        { text: 'But even with all those kilometers between us, you\'ve never felt far from my heart.', style: '' },
+        { text: 'Somehow, calls, messages, playlists, and little moments became our own way of being together.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '🌧️',
+      label: 'Chapter 6',
+      title: 'The Hard Chapters',
+      paragraphs: [
+        { text: 'Not every page of our story has been easy.', style: '' },
+        { text: 'We\'ve misunderstood each other.', style: 'short' },
+        { text: 'We\'ve had difficult conversations.', style: 'short' },
+        { text: 'We\'ve had moments where things felt heavy.', style: 'short' },
+        { text: 'But every difficult chapter taught us something.', style: '' },
+        { text: 'It reminded me that relationships aren\'t built because nothing goes wrong.', style: '' },
+        { text: 'They\'re built because two people keep choosing each other despite the difficult days.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '🌤️',
+      label: 'Chapter 7',
+      title: 'The Little Things',
+      paragraphs: [
+        { text: 'The little things became my favorite things.', style: '' },
+        { text: 'Your favorite song.', style: 'short' },
+        { text: 'The Pinterest pins.', style: 'short' },
+        { text: 'The way you say goodnight.', style: 'short' },
+        { text: 'The excitement you have over tiny things.', style: 'short' },
+        { text: 'The little habits that slowly became part of my everyday life.', style: 'short' },
+        { text: 'They\'re small.', style: '' },
+        { text: 'But somehow, they mean so much.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '🌟',
+      label: 'Chapter 8',
+      title: 'Thank You',
+      paragraphs: [
+        { text: 'Thank you...', style: '' },
+        { text: 'For the laughs.', style: 'short' },
+        { text: 'For listening.', style: 'short' },
+        { text: 'For staying.', style: 'short' },
+        { text: 'For trusting me.', style: 'short' },
+        { text: 'For making ordinary days feel less ordinary.', style: 'short' },
+        { text: 'Thank you for simply being you.', style: '' },
+        { text: 'I don\'t think I say it enough.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '🎂',
+      label: 'Chapter 9',
+      title: 'Today',
+      paragraphs: [
+        { text: 'And now...', style: '' },
+        { text: 'Here you are. Reading this.', style: 'short' },
+        { text: 'I spent a long time making this because I wanted your birthday to feel special.', style: '' },
+        { text: 'I hope somewhere along the way you smiled.', style: 'short' },
+        { text: 'I hope you laughed.', style: 'short' },
+        { text: 'Maybe even cried a little.', style: 'short' },
+        { text: 'Because every single page was made with one person in mind.', style: '' },
+        { text: 'You.', style: 'short' },
+        { text: 'Happy Birthday.', style: 'closing' },
+      ]
+    },
+    {
+      emoji: '✨',
+      label: 'Chapter 10',
+      title: 'To Be Continued…',
+      paragraphs: [
+        { text: 'This isn\'t the end.', style: '' },
+        { text: 'It\'s just the end of the pages we\'ve written so far.', style: '' },
+        { text: 'There are still so many chapters waiting for us.', style: '' },
+        { text: 'Our first real hug.', style: 'short' },
+        { text: 'Our first date.', style: 'short' },
+        { text: 'Watching sunsets together.', style: 'short' },
+        { text: 'Celebrating birthdays side by side.', style: 'short' },
+        { text: 'Making more memories.', style: 'short' },
+        { text: 'Growing together.', style: 'short' },
+        { text: 'And one day... looking back at this website and smiling because it was only the beginning.', style: '' },
+        { text: 'Until then...', style: '' },
+        { text: 'Here\'s to every chapter we\'ve already written... and every chapter still waiting for us.', style: '' },
+        { text: 'To be continued... ❤️', style: 'closing' },
+      ]
+    },
+  ];
+
+  /* ══ Build timeline ═════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('timeline');
+
+    CHAPTERS.forEach((ch, i) => {
+      // build paragraphs HTML
+      const parasHtml = ch.paragraphs.map(p =>
+        `<p class="${p.style}">${p.text}</p>`
+      ).join('');
+
+      const block = document.createElement('div');
+      block.className = 'chapter';
+      block.innerHTML = `
+        <div class="chapter-node"></div>
+        <div class="chapter-header">
+          <span class="chapter-emoji">${ch.emoji}</span>
+          <div class="chapter-meta">
+            <span class="chapter-label">${ch.label}</span>
+            <div class="chapter-title">${ch.title}</div>
+          </div>
+          <div class="chapter-chevron"></div>
+        </div>
+        <div class="chapter-body">
+          <div class="chapter-text">${parasHtml}</div>
+        </div>
+      `;
+
+      // toggle open/close
+      const header = block.querySelector('.chapter-header');
+      const body   = block.querySelector('.chapter-body');
+
+      header.addEventListener('click', () => {
+        const isOpen = block.classList.contains('open');
+        // close all others
+        document.querySelectorAll('.chapter.open').forEach(c => {
+          if (c !== block) {
+            c.classList.remove('open');
+            c.querySelector('.chapter-body').style.maxHeight = '0';
+          }
+        });
+        if (isOpen) {
+          block.classList.remove('open');
+          body.style.maxHeight = '0';
+        } else {
+          block.classList.add('open');
+          body.style.maxHeight = body.scrollHeight + 'px';
+          // smooth scroll into view
+          setTimeout(() => {
+            block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 180);
+        }
+      });
+
+      // re-calc maxHeight on window resize for open chapters
+      window.addEventListener('resize', () => {
+        if (block.classList.contains('open')) {
+          body.style.maxHeight = body.scrollHeight + 'px';
+        }
+      });
+
+      container.appendChild(block);
+    });
+
+    /* ── Intersection Observer: reveal chapters on scroll ── */
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, idx) => {
+        if (entry.isIntersecting) {
+          // small cascade delay based on position
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 60);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.chapter').forEach(ch => obs.observe(ch));
+  });
+</script>
+</body>
+                                                                                                                    </html>
 
